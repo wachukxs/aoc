@@ -15,9 +15,13 @@ numberOfAsteroids = arrLine.flat().filter(ast => ast === '#').length;
 console.log('numberOfAsteroids', numberOfAsteroids)
 
 // -- get map of asteroids
+/**an object of the cordinates of asteroids in the arrLine array */
 let objectMapOfAsteroids = [];
 
 arrLine.forEach((ele, ind) => ele.forEach((e, i) => { if (e === '#') objectMapOfAsteroids.push({ [e]: [ind, i] }) } ));
+
+// const getCordOfAsteroids = (line) => 
+// const getObjMapOfAsteroids = (line) => 
 
 console.log('objectMapOfAsteroids', objectMapOfAsteroids)
 
@@ -31,7 +35,7 @@ arrLine.forEach((element, ind, arr) => {
       // did objectMapOfAsteroids here
 
       // for asteroid [ind, i]
-      // console.log('for asteroid', [ind, i]);
+      console.log('for asteroid', [ind, i]);
 
       // find, index of the, next asteroid to the right.
       let s = element.indexOf('#', i + 1) // if s !== -1, count 1
@@ -44,8 +48,10 @@ arrLine.forEach((element, ind, arr) => {
 
       // get the cordinates of the asteroids in the next line [from our map]
       // count all the values with [ind + 1][]
-      let cords_ = objectMapOfAsteroids.filter((val, i) => val['#'][0] === ind + 1);
-
+      let nextArrLineIndex;
+      let nextArrLine = arrLine.find((ele, _i) => {nextArrLineIndex = _i; return ele.some(e => e === '#') && _i > ind} );
+      
+      let cords_ = objectMapOfAsteroids.filter((val, _i) => val['#'][0] === nextArrLineIndex ); // get the cordinates of all the asteroids in the next line
       // console.log('cords_ in next line', cords_);
       // get the number of steps it took for asteroids below
       let steps_ = cords_.map((ele) => [ind - ele['#'][0], i - ele['#'][1]] )
@@ -59,14 +65,20 @@ arrLine.forEach((element, ind, arr) => {
       // count all the asteroid in the previous line
       let ssss = arrLine[ind - 1] === undefined ? null : arrLine[ind - 1].filter(val => val === '#').length
 
+      let prevArrLineIndex;
+      /**this is just @var nextArrLine line reversed */
+      let prevArrLine = arrLine.reverse().find((ele, _i) => {prevArrLineIndex = _i; return ele.some(e => e === '#') && _i > ind} );
+      prevArrLineIndex = arrLine.length - 1 - prevArrLineIndex; // https://stackoverflow.com/a/60744862 // because we're reversing, we need to get the prev index of the element we got before reversing
+      /**cordinates of the asteroids in the previous array line */
+      let _cords = objectMapOfAsteroids.filter((val, _i) => val['#'][0] === prevArrLineIndex );
       /* get the cordinates of the asteroids in the next previous line [from our map]
       count all the values with [ind - 1][] */ // here needs work
-      let _cords = objectMapOfAsteroids.filter((val, _i) => 
+      /* let _cords = objectMapOfAsteroids.filter((val, _i) => 
       val['#'][0] === ind - 1 // the asteroid is a connected on, i.e in direct previous line
       && arrLine[ind - 1].every(as => as !== '.') // the previous asteroid line must not be empty
-      )
+      ) */
       // console.log('_cords in previous line', _cords);
-      // get the number of steps it took for asteroids above
+      /**the number of steps it took for asteroids above/in previous array line */
       let _steps = _cords.map((ele) => [ind - ele['#'][0], i - ele['#'][1]] )
       console.log('steps for asteroids above', _steps); // [ [ -1, 1 ], [ -1, 0 ] ]
       // rename, asterLeft, blockedAsterLeft
@@ -75,11 +87,13 @@ arrLine.forEach((element, ind, arr) => {
       // remove all the asteroids that they're blocking above // 1st logic, cord of line < step to move up
       // _steps.forEach((aster, _ind) => blockedAsterFarAbove = objectMapOfAsteroids.filter(astr => (/* astr['#'][0] < aster[0] && */ astr['#'][0] % aster[0] === 0 && astr['#'][1] % aster[1] === 0)  ) ) // by getting all the multiples afar off, 
       _steps.forEach((aster, _ind) => 
-        blockedAsterFarAbove = objectMapOfAsteroids.filter(astr => 
-          (astr['#'][0] < aster[0] && // asteroid must be less-than/above array line of connected asteroid in above line
+        blockedAsterFarAbove.concat( objectMapOfAsteroids.filter(astr => 
+          (astr['#'][0] < prevArrLineIndex && // asteroid must be less-than/above array line of connected asteroid in above line
           
           (ind - astr['#'][0]) % aster[0] === 0 // RULE = above => [source] - [number of steps] = [destination cordinates] // so [source] - [destination] % [steps] === 0
-          && (i - astr['#'][1]) % aster[1] === 0)  ) ) // getting all the multiples afar off,
+          && (i - astr['#'][1]) % aster[1] === 0)  )
+        )
+      ) // getting all the multiples afar off,
       console.log('Blocked asteroids far above', 'for asteroid', [ind, i], blockedAsterFarAbove);
       
       //-------------
@@ -88,11 +102,13 @@ arrLine.forEach((element, ind, arr) => {
       // remove all the asteroids that they're blocking below
       // steps_.forEach(aster => blockedAsterFarBelow = objectMapOfAsteroids.filter(astr => ( aster[0] > astr['#'][0] && astr['#'][0] % aster[0] === 0 && astr['#'][1] % aster[1] === 0)  ) ) // by getting all the multiples afar off, 
       steps_.forEach((aster, _ind) => 
-      blockedAsterFarBelow = objectMapOfAsteroids.filter(astr => 
-        (astr['#'][0] > aster[0] && // asteroid must be greater-than/below array line of connected asteroid in below line
-        
-        (ind - astr['#'][0]) % aster[0] === 0 // RULE = below => [source] - [number of steps] = [destination cordinates] // so [source] - [destination] % [steps] === 0
-        && (i - astr['#'][1]) % aster[1] === 0)  ) ) // getting all the multiples afar off,
+        blockedAsterFarBelow.concat( objectMapOfAsteroids.filter(astr => 
+          (astr['#'][0] > nextArrLineIndex && // asteroid must be greater-than/below array line of connected asteroid in below line
+          
+          (ind - astr['#'][0]) % aster[0] === 0 // RULE = below => [source] - [number of steps] = [destination cordinates] // so [source] - [destination] % [steps] === 0
+          && (i - astr['#'][1]) % aster[1] === 0)  )
+        )
+      ) // getting all the multiples afar off,
       console.log('Blocked asteroids far below', 'for asteroid', [ind, i], blockedAsterFarBelow)
       //-------------
 
@@ -114,7 +130,7 @@ arrLine.forEach((element, ind, arr) => {
       let AsterDown = objectMapOfAsteroids.filter(astr => (astr['#'][0] >= ind + 1 && astr['#'][1] === i  ) );
       // AsterDown.shift();
       let blockedAsterDown = AsterDown.length > 1 ? AsterDown.slice(1, AsterDown.length) : []
-      // console.log('Blocked asteroids down', 'for asteroid', [ind, i], blockedAsterDown ); // getting asteroids to the down,
+      console.log('Blocked asteroids down', 'for asteroid', [ind, i], blockedAsterDown ); // getting asteroids to the down,
       // then find the asteroids in the next-next line & remove, repeat. do the same for the prev-prev line
       
       // [y,x]
