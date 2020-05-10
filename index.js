@@ -50,7 +50,10 @@ arrLine.forEach((element, ind, arr) => {
       // get the number of steps it took for asteroids below
       let steps_ = cords_.map((ele) => [ind - ele['#'][0], i - ele['#'][1]] )
       // console.log('steps for asteroids below', steps_); // [ [ -1, 1 ], [ -1, 0 ] ]
-
+      // for each direct asteroid aboe
+      // RULE = above => [source] - [number of steps] = [destination cordinates] // so [source] - [destination] % [steps] === 0
+      // for each direct asteroid below
+      // RULE = below => [source] - [number of steps] = [destination cordinates] // so [source] - [destination] % [steps] === 0
       // --  
 
       // count all the asteroid in the previous line
@@ -67,8 +70,8 @@ arrLine.forEach((element, ind, arr) => {
       let blockedAsterFarAbove = [];
 
       // remove all the asteroids that they're blocking above // 1st logic, cord of line < step to move up
-      _steps.forEach((aster, _ind) => blockedAsterFarAbove = objectMapOfAsteroids.filter(astr => (/* astr['#'][0] < aster[0] && */ astr['#'][0] <= _cords[0][0] + 1 && astr['#'][0] % aster[0] === 0 && astr['#'][1] % aster[1] === 0)  ) ) // by getting all the multiples afar off, 
-
+      // _steps.forEach((aster, _ind) => blockedAsterFarAbove = objectMapOfAsteroids.filter(astr => (/* astr['#'][0] < aster[0] && */ astr['#'][0] <= _cords[0][0] + 1 && astr['#'][0] % aster[0] === 0 && astr['#'][1] % aster[1] === 0)  ) ) // by getting all the multiples afar off, 
+      _steps.forEach((aster, _ind) => blockedAsterFarAbove = objectMapOfAsteroids.filter(astr => (/* astr['#'][0] < aster[0] && */ astr['#'][0] <= _cords[0][0] + 1 && astr['#'][0] % aster[0] === 0 && astr['#'][1] % aster[1] === 0)  ) ) // by getting all the multiples afar off,
       console.log('Blocked asteroids far above', 'for asteroid', [ind, i], blockedAsterFarAbove);
       
       //-------------
